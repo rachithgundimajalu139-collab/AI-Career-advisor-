@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuraPath AI Career Advisor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #0cf;
+            --secondary: #a64dff;
+            --accent: #ff00cc;
+            --dark: #0a0a1a;
+            --darker: #050510;
+            --light: #f0f0fc;
+            --card-bg: rgba(25, 25, 50, 0.6);
+            --glow: 0 0 10px var(--primary), 0 0 20px var(--primary);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--darker), var(--dark));
+            color: var(--light);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(100, 100, 255, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(255, 100, 255, 0.1) 0%, transparent 40%);
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            text-shadow: var(--glow);
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .tagline {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(100, 100, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 200, 255, 0.2);
+        }
+        
+        .card-title {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-title i {
+            font-size: 1.5rem;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(0, 200, 255, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 200, 255, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(20, 20, 40, 0.6);
+            border: 1px solid rgba(100, 100, 255, 0.3);
+            border-radius: 8px;
+            font-size: 1rem;
+            color: var(--light);
+            transition: all 0.3s ease;
+        }
+        
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(0, 200, 255, 0.3);
+        }
+        
+        .skill-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: rgba(20, 20, 40, 0.4);
+            border-radius: 8px;
+        }
+        
+        .skill-name {
+            flex: 2;
+        }
+        
+        .skill-level {
+            flex: 3;
+        }
+        
+        .skill-remove {
+            flex: 1;
+            text-align: right;
+        }
+        
+        .career-path {
+            border-left: 4px solid var(--accent);
+            padding-left: 1.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        .career-path::before {
+            content: '';
+            position: absolute;
+            left: -7px;
+            top: 0;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
+        }
+        
+        .progress-container {
+            margin-bottom: 1rem;
+        }
+        
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            border-radius: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            box-shadow: 0 0 10px var(--primary);
+            transition: width 1s ease-in-out;
+        }
+        
+        .resource-list {
+            list-style-type: none;
+        }
+        
+        .resource-list li {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .resource-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .resource-list li::before {
+            content: '▸';
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .flex-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .flex-container > div {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .skill-visualization {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 1.5rem;
+        }
+        
+        .skill-chart {
+            background: rgba(20, 20, 40, 0.4);
+            border-radius: 10px;
+            padding: 1rem;
+            position: relative;
+        }
+        
+        .ai-assistant {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0, 200, 255, 0.4);
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+        
+        .ai-assistant:hover {
+            transform: scale(1.1);
+        }
+        
+        .ai-assistant i {
+            font-size: 24px;
+            color: white;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 2rem;
+            color: rgba(255, 255, 255, 0.6);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .flex-container {
+                flex-direction: column;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .skill-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+        
+        /* Animation for futuristic elements */
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+        
+        .pulse {
+            animation: pulse 3s infinite ease-in-out;
+        }
+        
+        /* Step progress indicator */
+        .steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        .steps::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+        
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--dark);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .step.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            box-shadow: var(--glow);
+        }
+        
+        .step.completed {
+            background: var(--secondary);
+            border-color: var(--secondary);
+        }
+        
+        /* AI Thinking Animation */
+        .thinking {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            margin: 2rem 0;
+        }
+        
+        .thinking span {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--primary);
+            animation: bounce 1.5s infinite ease-in-out;
+        }
+        
+        .thinking span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .thinking span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-brain-circuit"></i>
+            </div>
+            <h1>NeuraPath AI Career Advisor</h1>
+            <p class="tagline">Mapping your future in the evolving world of AI and technology</p>
+            
+            <div class="steps">
+                <div class="step active">1</div>
+                <div class="step">2</div>
+                <div class="step">3</div>
+                <div class="step">4</div>
+                <div class="step">5</div>
+            </div>
+        </header>
+
+        <div class="card">
+            <h2 class="card-title"><i class="fas fa-user-astronaut"></i> Personal Profile</h2>
+            <div class="flex-container">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" placeholder="Enter your name">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="Enter your email">
+                </div>
+            </div>
+            
+            <div class="flex-container">
+                <div class="form-group">
+                    <label for="education">Current Education Level</label>
+                    <select id="education">
+                        <option value="">Select your education level</option>
+                        <option value="highschool">High School</option>
+                        <option value="bachelor">Bachelor's Degree</option>
+                        <option value="master">Master's Degree</option>
+                        <option value="phd">PhD</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="experience">Years of Experience</label>
+                    <select id="experience">
+                        <option value="0">No experience</option>
+                        <option value="1-2">1-2 years</option>
+                        <option value="3-5">3-5 years</option>
+                        <option value="5+">5+ years</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button class="btn" onclick="nextStep(1)">
+                Next <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+
+        <div class="card hidden" id="skills-card">
+            <h2 class="card-title"><i class="fas fa-code"></i> Skills Assessment</h2>
+            <p>Add your technical and soft skills with proficiency levels</p>
+            
+            <div id="skills-container">
+                <div class="skill-item">
+                    <div class="skill-name">
+                        <input type="text" placeholder="Skill name (e.g., Python, Communication)">
+                    </div>
+                    <div class="skill-level">
+                        <select>
+                            <option value="1">Beginner</option>
+                            <option value="2">Intermediate</option>
+                            <option value="3">Advanced</option>
+                            <option value="4">Expert</option>
+                        </select>
+                    </div>
+                    <div class="skill-remove">
+                        <button class="btn btn-secondary" onclick="removeSkill(this)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn btn-secondary" onclick="addSkill()" style="margin-top: 15px;">
+                <i class="fas fa-plus"></i> Add Skill
+            </button>
+            
+            <div style="margin-top: 30px;">
+                <button class="btn" onclick="nextStep(2)">
+                    Next <i class="fas fa-arrow-right"></i>
+                </button>
+                <button class="btn btn-secondary" onclick="prevStep(2)" style="margin-left: 10px;">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+            </div>
+        </div>
+
+        <div class="card hidden" id="interests-card">
+            <h2 class="card-title"><i class="fas fa-star"></i> Career Interests & Goals</h2>
+            
+            <div class="form-group">
+                <label for="interests">Select your areas of interest (hold Ctrl/Cmd to select multiple)</label>
+                <select id="interests" multiple size="6">
+                    <option value="ml">Machine Learning</option>
+                    <option value="nlp">Natural Language Processing</option>
+                    <option value="cv">Computer Vision</option>
+                    <option value="robotics">Robotics & Automation</option>
+                    <option value="data_science">Data Science & Analytics</option>
+                    <option value="ai_ethics">AI Ethics & Policy</option>
+                    <option value="ai_research">AI Research</option>
+                    <option value="ai_engineering">AI Engineering & MLOps</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="career-goal">Primary Career Goal</label>
+                <select id="career-goal">
+                    <option value="">Select your primary goal</option>
+                    <option value="entry">Entry-level position</option>
+                    <option value="advancement">Career advancement</option>
+                    <option value="transition">Career transition</option>
+                    <option value="leadership">Leadership role</option>
+                    <option value="research">Research position</option>
+                </select>
+            </div>
+            
+            <div>
+                <button class="btn" onclick="nextStep(3)">
+                    Next <i class="fas fa-arrow-right"></i>
+                </button>
+                <button class="btn btn-secondary" onclick="prevStep(3)" style="margin-left: 10px;">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+            </div>
+        </div>
+
+        <div class="card hidden" id="analysis-card">
+            <h2 class="card-title"><i class="fas fa-microchip"></i> AI Analysis</h2>
+            
+            <div class="thinking">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            
+            <p style="text-align: center; margin-bottom: 2rem;">Our AI is analyzing your profile against current market trends...</p>
+            
+            <div style="text-align: center;">
+                <button class="btn" onclick="analyzeCareerPath()">
+                    Generate Career Plan <i class="fas fa-rocket"></i>
+                </button>
+                <button class="btn btn-secondary" onclick="prevStep(4)" style="margin-left: 10px;">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+            </div>
+        </div>
+
+        <div id="results-section" class="hidden">
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-rocket"></i> Your AI Career Path</h2>
+                
+                <div class="skill-visualization" id="skill-visualization">
+                    <!-- Skill visualization will be inserted here -->
+                </div>
+            </div>
+
+            <div class="flex-container">
+                <div class="card">
+                    <h2 class="card-title"><i class="fas Route"></i> Recommended Career Paths</h2>
+                    <div id="career-paths">
+                        <!-- Career paths will be inserted here -->
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-bridge"></i> Skill Gap Analysis</h2>
+                    <div id="skill-gaps">
+                        <!-- Skill gaps will be inserted here -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-books"></i> Personalized Learning Resources</h2>
+                <div id="learning-resources">
+                    <!-- Learning resources will be inserted here -->
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 2rem;">
+                <button class="btn" onclick="saveProfile()">
+                    <i class="fas fa-save"></i> Save Profile
+                </button>
+                <button class="btn btn-secondary" onclick="window.print()" style="margin-left: 10px;">
+                    <i class="fas fa-print"></i> Print Report
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="ai-assistant">
+        <i class="fas fa-robot"></i>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>NeuraPath AI Career Advisor © 2023 | Powered by advanced AI market analysis</p>
+            <p>Helping you navigate the future of work in artificial intelligence</p>
+        </div>
+    </footer>
+
+    <script>
+        // Enhanced career paths database
+        const careerPaths = {
+            'ml': {
+                name: 'Machine Learning Engineer',
+                description: 'Design and implement machine learning applications to solve complex problems.',
+                futureOutlook: 'Very strong growth with 22% expected job growth over the next decade',
+                requiredSkills: [
+                    {name: 'Python', level: 4},
+                    {name: 'TensorFlow/PyTorch', level: 3},
+                    {name: 'Data Preprocessing', level: 3},
+                    {name: 'Statistics', level: 3},
+                    {name: 'ML Algorithms', level: 4}
+                ],
+                resources: [
+                    'Coursera: Machine Learning by Andrew Ng',
+                    'Book: "Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow"',
+                    'Kaggle competitions to practice real-world problems',
+                    'Advanced course: Deep Learning Specialization on Coursera'
+                ],
+                salaryRange: '$110,000 - $165,000',
+                growthPotential: 'High'
+            },
+            'data_science': {
+                name: 'Data Scientist',
+                description: 'Extract insights from complex data to guide business decisions.',
+                futureOutlook: 'Strong growth with 15% expected job growth over the next decade',
+                requiredSkills: [
+                    {name: 'Python/R', level: 3},
+                    {name: 'SQL', level: 3},
+                    {name: 'Data Visualization', level: 3},
+                    {name: 'Statistical Analysis', level: 4},
+                    {name: 'Big Data Technologies', level: 3}
+                ],
+                resources: [
+                    'EdX: Data Science MicroMasters',
+                    'Book: "Python for Data Analysis"',
+                    'Practice with real datasets on platforms like Kaggle',
+                    'Advanced course: Applied Data Science with Python'
+                ],
+                salaryRange: '$105,000 - $155,000',
+                growthPotential: 'High'
+            },
+            'nlp': {
+                name: 'NLP Specialist',
+                description: 'Develop systems that can understand, interpret, and generate human language.',
+                futureOutlook: 'Very strong growth with 28% expected job growth over the next decade',
+                requiredSkills: [
+                    {name: 'Python', level: 3},
+                    {name: 'NLTK/spaCy', level: 3},
+                    {name: 'Transformers', level: 3},
+                    {name: 'Linguistics', level: 2},
+                    {name: 'Deep Learning', level: 3}
+                ],
+                resources: [
+                    'Course: Natural Language Processing with Deep Learning',
+                    'Book: "Speech and Language Processing"',
+                    'Hugging Face courses on transformer models',
+                    'Advanced course: NLP with Attention Models'
+                ],
+                salaryRange: '$115,000 - $170,000',
+                growthPotential: 'Very High'
+            },
+            'ai_ethics': {
+                name: 'AI Ethics Specialist',
+                description: 'Ensure AI systems are developed and deployed responsibly and fairly.',
+                futureOutlook: 'Emerging field with rapid growth expected as regulation increases',
+                requiredSkills: [
+                    {name: 'Ethics', level: 4},
+                    {name: 'Policy Knowledge', level: 3},
+                    {name: 'AI Fundamentals', level: 3},
+                    {name: 'Communication', level: 4},
+                    {name: 'Legal Frameworks', level: 3}
+                ],
+                resources: [
+                    'Course: Ethics of AI from the University of Helsinki',
+                    'Book: "Atlas of AI" by Kate Crawford',
+                    'Join AI ethics communities and forums',
+                    'Course: AI Policy and Governance'
+                ],
+                salaryRange: '$95,000 - $145,000',
+                growthPotential: 'Very High'
+            },
+            'ai_engineering': {
+                name: 'AI/MLOps Engineer',
+                description: 'Build and maintain infrastructure for deploying and monitoring AI systems at scale.',
+                futureOutlook: 'Very strong growth with 25% expected job growth over the next decade',
+                requiredSkills: [
+                    {name: 'Python', level: 4},
+                    {name: 'Cloud Platforms', level: 3},
+                    {name: 'Containerization', level: 3},
+                    {name: 'CI/CD', level: 3},
+                    {name: 'Monitoring', level: 3}
+                ],
+                resources: [
+                    'Course: MLOps Fundamentals',
+                    'Book: "Introducing MLOps"',
+                    'AWS/GCP/Azure ML certifications',
+                    'Kubernetes for ML workloads'
+                ],
+                salaryRange: '$120,000 - $180,000',
+                growthPotential: 'Very High'
+            }
+        };
+
+        // Function to navigate between steps
+        function nextStep(step) {
+            if (step === 1) {
+                document.querySelector('.card:first-child').classList.add('hidden');
+                document.getElementById('skills-card').classList.remove('hidden');
+                updateSteps(2);
+            } else if (step === 2) {
+                document.getElementById('skills-card').classList.add('hidden');
+                document.getElementById('interests-card').classList.remove('hidden');
+                updateSteps(3);
+            } else if (step === 3) {
+                document.getElementById('interests-card').classList.add('hidden');
+                document.getElementById('analysis-card').classList.remove('hidden');
+                updateSteps(4);
+            }
+        }
+        
+        function prevStep(step) {
+            if (step === 2) {
+                document.getElementById('skills-card').classList.add('hidden');
+                document.querySelector('.card:first-child').classList.remove('hidden');
+                updateSteps(1);
+            } else if (step === 3) {
+                document.getElementById('interests-card').classList.add('hidden');
+                document.getElementById('skills-card').classList.remove('hidden');
+                updateSteps(2);
+            } else if (step === 4) {
+                document.getElementById('analysis-card').classList.add('hidden');
+                document.getElementById('interests-card').classList.remove('hidden');
+                updateSteps(3);
+            }
+        }
+        
+        function updateSteps(activeStep) {
+            const steps = document.querySelectorAll('.step');
+            steps.forEach((step, index) => {
+                if (index + 1 < activeStep) {
+                    step.classList.add('completed');
+                    step.classList.remove('active');
+                } else if (index + 1 === activeStep) {
+                    step.classList.add('active');
+                    step.classList.remove('completed');
+                } else {
+                    step.classList.remove('active', 'completed');
+                }
+            });
+        }
+
+        // Function to add a new skill field
+        function addSkill() {
+            const container = document.getElementById('skills-container');
+            const newSkill = document.createElement('div');
+            newSkill.className = 'skill-item';
+            newSkill.innerHTML = `
+                <div class="skill-name">
+                    <input type="text" placeholder="Skill name (e.g., Python, Communication)">
+                </div>
+                <div class="skill-level">
+                    <select>
+                        <option value="1">Beginner</option>
+                        <option value="2">Intermediate</option>
+                        <option value="3">Advanced</option>
+                        <option value="4">Expert</option>
+                    </select>
+                </div>
+                <div class="skill-remove">
+                    <button class="btn btn-secondary" onclick="removeSkill(this)">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+            container.appendChild(newSkill);
+        }
+
+        // Function to remove a skill field
+        function removeSkill(button) {
+            // Don't remove if it's the only skill
+            if (document.querySelectorAll('.skill-item').length > 1) {
+                button.closest('.skill-item').remove();
+            }
+        }
+
+        // Main function to analyze career path
+        function analyzeCareerPath() {
+            // Get user skills
+            const userSkills = [];
+            document.querySelectorAll('.skill-item').forEach(item => {
+                const nameInput = item.querySelector('input[type="text"]');
+                const levelSelect = item.querySelector('select');
+                
+                if (nameInput.value.trim() !== '') {
+                    userSkills.push({
+                        name: nameInput.value.trim(),
+                        level: parseInt(levelSelect.value)
+                    });
+                }
+            });
+
+            // Get selected interests
+            const interestSelect = document.getElementById('interests');
+            const selectedInterests = [];
+            for (let i = 0; i < interestSelect.options.length; i++) {
+                if (interestSelect.options[i].selected) {
+                    selectedInterests.push(interestSelect.options[i].value);
+                }
+            }
+            
+            // Get career goal
+            const careerGoal = document.getElementById('career-goal').value;
+
+            // Validate inputs
+            if (userSkills.length === 0) {
+                alert('Please add at least one skill');
+                return;
+            }
+
+            if (selectedInterests.length === 0) {
+                alert('Please select at least one area of interest');
+                return;
+            }
+            
+            if (!careerGoal) {
+                alert('Please select your primary career goal');
+                return;
+            }
+
+            // Show analysis in progress
+            document.getElementById('analysis-card').classList.add('hidden');
+            
+            // Generate skill visualization
+            visualizeSkills(userSkills);
+
+            // Find matching career paths
+            recommendCareers(userSkills, selectedInterests, careerGoal);
+
+            // Show results section
+            document.getElementById('results-section').classList.remove('hidden');
+            updateSteps(5);
+            
+            // Scroll to results
+            document.getElementById('results-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Function to visualize skills
+        function visualizeSkills(skills) {
+            const container = document.getElementById('skill-visualization');
+            container.innerHTML = '<h3 style="grid-column: 1 / -1;">Your Current Skills Profile</h3>';
+            
+            skills.forEach(skill => {
+                const skillElem = document.createElement('div');
+                skillElem.className = 'skill-chart';
+                skillElem.innerHTML = `
+                    <h4>${skill.name}</h4>
+                    <div class="progress-container">
+                        <div class="progress-label">
+                            <span>Proficiency</span>
+                            <span>${getLevelText(skill.level)}</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: ${skill.level * 25}%"></div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(skillElem);
+            });
+        }
+
+        // Function to recommend careers based on skills and interests
+        function recommendCareers(userSkills, interests, careerGoal) {
+            const careerContainer = document.getElementById('career-paths');
+            const gapContainer = document.getElementById('skill-gaps');
+            
+            careerContainer.innerHTML = '';
+            gapContainer.innerHTML = '<h3>Areas for Development</h3>';
+            
+            // For each interest, find matching career paths
+            interests.forEach(interest => {
+                if (careerPaths[interest]) {
+                    const career = careerPaths[interest];
+                    const careerElem = document.createElement('div');
+                    careerElem.className = 'career-path';
+                    
+                    // Calculate match percentage
+                    const matchPercent = calculateMatchPercentage(userSkills, career.requiredSkills);
+                    
+                    careerElem.innerHTML = `
+                        <h3>${career.name} <span style="color: var(--accent);">${matchPercent}% Match</span></h3>
+                        <p>${career.description}</p>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>Future Outlook:</span>
+                                <span>${career.futureOutlook}</span>
+                            </div>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>Salary Range:</span>
+                                <span>${career.salaryRange}</span>
+                            </div>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>Growth Potential:</span>
+                                <span>${career.growthPotential}</span>
+                            </div>
+                        </div>
+                        <h4>Required Skills:</h4>
+                        <ul>
+                            ${career.requiredSkills.map(skill => 
+                                `<li>${skill.name} (${getLevelText(skill.level)})</li>`
+                            ).join('')}
+                        </ul>
+                        <h4>Recommended Resources:</h4>
+                        <ul class="resource-list">
+                            ${career.resources.map(resource => 
+                                `<li>${resource}</li>`
+                            ).join('')}
+                        </ul>
+                    `;
+                    
+                    careerContainer.appendChild(careerElem);
+                    
+                    // Calculate skill gaps for this career
+                    const gaps = calculateSkillGaps(userSkills, career.requiredSkills);
+                    if (gaps.length > 0) {
+                        const gapElem = document.createElement('div');
+                        gapElem.innerHTML = `
+                            <h4>For ${career.name}:</h4>
+                            <ul>
+                                ${gaps.map(gap => 
+                                    `<li>${gap.name} - target: ${getLevelText(gap.requiredLevel)}, current: ${getLevelText(gap.currentLevel)}</li>`
+                                ).join('')}
+                            </ul>
+                        `;
+                        gapContainer.appendChild(gapElem);
+                    }
+                }
+            });
+        }
+
+        // Calculate match percentage between user skills and required skills
+        function calculateMatchPercentage(userSkills, requiredSkills) {
+            let totalScore = 0;
+            let maxScore = 0;
+            
+            requiredSkills.forEach(requiredSkill => {
+                const userSkill = userSkills.find(s => s.name.toLowerCase() === requiredSkill.name.toLowerCase());
+                maxScore += requiredSkill.level;
+                
+                if (userSkill) {
+                    totalScore += Math.min(userSkill.level, requiredSkill.level);
+                }
+            });
+            
+            return Math.round((totalScore / maxScore) * 100);
+        }
+
+        // Helper function to calculate skill gaps
+        function calculateSkillGaps(userSkills, requiredSkills) {
+            const gaps = [];
+            
+            requiredSkills.forEach(requiredSkill => {
+                const userSkill = userSkills.find(s => s.name.toLowerCase() === requiredSkill.name.toLowerCase());
+                
+                if (!userSkill || userSkill.level < requiredSkill.level) {
+                    gaps.push({
+                        name: requiredSkill.name,
+                        requiredLevel: requiredSkill.level,
+                        currentLevel: userSkill ? userSkill.level : 0
+                    });
+                }
+            });
+            
+            return gaps;
+        }
+
+        // Helper function to get text representation of skill level
+        function getLevelText(level) {
+            switch(level) {
+                case 1: return 'Beginner';
+                case 2: return 'Intermediate';
+                case 3: return 'Advanced';
+                case 4: return 'Expert';
+                default: return 'No knowledge';
+            }
+        }
+        
+        // Save profile function (simulated)
+        function saveProfile() {
+            alert('Profile saved successfully! In a real application, this would save to a database.');
+        }
+
+        // Initialize with one skill field
+        window.onload = function() {
+            addSkill();
+            updateSteps(1);
+        };
+    </script>
+</body>
+</html> This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v4
+
+      # Runs a single command using the runners shell
+      - name: Run a one-line script
+        run: echo Hello, world!
+
+      # Runs a set of commands using the runners shell
+      - name: Run a multi-line script
+        run: |
+          echo Add other actions to build,
+          echo test, and deploy your project.
